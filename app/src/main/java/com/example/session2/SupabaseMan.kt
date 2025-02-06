@@ -12,7 +12,6 @@ val supabase = createSupabaseClient(
 ) {
     //  install(Auth)
     install(Postgrest)
-    //install other modules
     defaultSerializer = JacksonSerializer()
 }
     suspend fun GetMain(): List<Main> {
