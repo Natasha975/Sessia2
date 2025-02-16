@@ -1,46 +1,30 @@
 package com.example.session2
 
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.serializer.JacksonSerializer
 
 val supabase = createSupabaseClient(
-    supabaseUrl = "",
-    supabaseKey = ""
+    supabaseUrl = "https://kkvpucjozqqviytsovmc.supabase.co",
+    supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrdnB1Y2pvenFxdml5dHNvdm1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MDc1MTUsImV4cCI6MjA1NTI4MzUxNX0.qdjJLX7KYaRZUzDcfy89UgcMqMq_KtK39dbNAEMKWqI"
 ) {
-    //  install(Auth)
+    install(Auth)
     install(Postgrest)
     defaultSerializer = JacksonSerializer()
 }
-    suspend fun GetMain(): List<Main> {
-        return supabase.from("Per").select().decodeList<Main>()
-    }
+val auth = supabase.auth
 
-    suspend fun PostMain(id: Int, Name: String, Photo: String, Birthday: String){
-        supabase.from("Per").insert(mapOf(
-            "id" to id,
-            "Name" to Name,
-            "Photo" to Photo,
-            "Birthday" to Birthday
-        ))
+suspend fun signUpUser(email: String, password: String) {
+    try {
+        val user = supabase.auth.signUpWith(OtpType.Email) {
+            this.email = email
+            this.password = password
+        }
+        println("User зарегистрирован: ${user.user?.email}")
+    } catch (e: Exception) {
+        println("Ошибка при регистрации пользователя: ${e.message}")
     }
-//suspend fun signUp(mail: String, pass: String, phone: String, name:String) {
-//    supa.auth.signUpWith(Email){
-//        email = mail
-//        password = pass
-//    }
-//    val user = supa.auth.sessionManager.loadSession()?.user?.id
-//
-//    val newUser = UserModel(user!!, balance = 0.00f, is_courier = false, name = name, phone_number = phone, created_at = now())
-//    supa.from("users").insert(newUser)
-//
-//}
-
-data class Main(
-    val id:Int,
-    val Name:String,
-    val Photo: String,
-    val Birthday: String
-)
+}
